@@ -1,0 +1,30 @@
+name: Extract AKAYAR V2
+
+on:
+  push:
+    paths:
+      - "akayar-stationery-v2.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract project
+        run: |
+          unzip -o akayar-stationery-v2.zip -d akayar-temp
+          cp -r akayar-temp/* .
+          rm -rf akayar-temp
+          rm akayar-stationery-v2.zip
+
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Extract AKAYAR V2 project" || exit 0
+          git push
