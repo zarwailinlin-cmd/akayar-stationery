@@ -1,0 +1,6 @@
+ "use client";
+import {useState} from "react";
+import Link from "next/link";
+export default function Admin(){const[phone,setPhone]=useState(""),[name,setName]=useState(""),[amount,setAmount]=useState(""),[msg,setMsg]=useState("");
+async function addPurchase(){setMsg("");const r=await fetch("/api/admin/purchase",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone,name,amount:Number(amount)})});const d=await r.json();setMsg(r.ok?`အောင်မြင်ပါပြီ — +${d.points} Points (စုစုပေါင်း ${d.totalPoints})`:d.error||"Error")}
+return <main className="shell"><Link href="/" className="back">← AKAYAR Home</Link><section className="panel"><div className="badge">ADMIN</div><h1>Purchase & Point</h1><p className="muted">1,000 Ks = 1 Point</p><label>Customer Phone</label><input value={phone} onChange={e=>setPhone(e.target.value)} placeholder="09xxxxxxxxx"/><label>Customer Name (အသစ်ဆို)</label><input value={name} onChange={e=>setName(e.target.value)} placeholder="Customer name"/><label>Purchase Amount (Ks)</label><input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="20000"/><button className="wide" onClick={addPurchase}>Purchase ထည့် + Point တွက်</button>{msg&&<p className="success">{msg}</p>}</section></main>}
