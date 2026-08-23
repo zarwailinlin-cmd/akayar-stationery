@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - "akayar-stationery-v2.zip"
-
+  workflow_dispatch:
 permissions:
   contents: write
 
