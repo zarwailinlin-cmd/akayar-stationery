@@ -1,5 +1,5 @@
-import {NextResponse} from "next/server";
-import {supabaseAdmin} from "@/lib/supabase";
+import { NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function GET(req) {
   try {
@@ -7,16 +7,17 @@ export async function GET(req) {
 
     if (!phone) {
       return NextResponse.json(
-        {error: "Phone is required"},
-        {status: 400}
+        { error: "Phone is required" },
+        { status: 400 }
       );
     }
 
     const sb = supabaseAdmin();
 
-    const {data: customer, error: customerError} = await sb
+    // Find customer
+    const { data: customer, error: customerError } = await sb
       .from("customers")
-      .select("id,phone,name,points,member_level")
+      .select("id, phone, name, points, member_level")
       .eq("phone", phone)
       .maybeSingle();
 
@@ -24,34 +25,39 @@ export async function GET(req) {
 
     if (!customer) {
       return NextResponse.json(
-        {error: "Member မတွေ့ပါ"},
-        {status: 404}
+        { error: "Member မတွေ့ပါ" },
+        { status: 404 }
       );
     }
 
-    const {data: purchases, error: purchaseError} = await sb
+    // Get purchase history
+    const { data: purchases, error: purchaseError } = await sb
       .from("purchases")
-      .select("id,amount,points_earned,created_at")
+      .select("id, amount, points_earned, created_at")
       .eq("customer_id", customer.id)
-      .order("created_at", {ascending: false});
+      .order("created_at", { ascending: false });
 
     if (purchaseError) throw purchaseError;
 
+    // Calculate total purchase amount
     const totalPurchase = (purchases || []).reduce(
       (sum, item) => sum + Number(item.amount || 0),
       0
     );
 
     return NextResponse.json({
-      ...customer,
+      id: customer.id,
+      phone: customer.phone,
+      name: customer.name,
+      points: customer.points,
+      member_level: customer.member_level,
       totalPurchase,
-      purchases: purchases || []
+      purchases: purchases || [],
     });
-
   } catch (e) {
     return NextResponse.json(
-      {error: e.message},
-      {status: 500}
+      { error: e.message },
+      { status: 500 }
     );
   }
 }
