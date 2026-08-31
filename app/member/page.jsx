@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 export default function Member() {
@@ -14,7 +14,8 @@ export default function Member() {
     setMember(null);
 
     if (!phone.trim()) {
-      return setMsg("Phone number ထည့်ပါ။");
+      setMsg("Phone number ထည့်ပါ။");
+      return;
     }
 
     setLoading(true);
@@ -62,79 +63,61 @@ export default function Member() {
           />
 
           <button onClick={lookup} disabled={loading}>
-            {loading ? "ရှာနေသည်..." : "ရှာမယ်"}
+            {loading ? "ရှာနေပါတယ်..." : "ရှာမယ်"}
           </button>
         </div>
 
         {msg && <p className="error">{msg}</p>}
 
         {member && (
-          <>
-            <div className="member">
-              <div>
-                <div className="muted">Member</div>
+          <div className="member">
+            <div>
+              <div className="muted">Member</div>
 
-                <h2>{member.name}</h2>
+              <h2>{member.name}</h2>
 
-                <p>{member.phone}</p>
+              <p>{member.phone}</p>
 
-                <span className="level">
-                  {member.member_level}
-                </span>
-              </div>
-
-              <div className="points">
-                {member.points}
-                <small>POINTS</small>
-              </div>
+              <span className="level">
+                {member.member_level}
+              </span>
             </div>
 
-            <div className="summary">
-              <div className="summary-card">
-                <span>Total Purchase</span>
+            <div className="points">
+              {member.points}
+              <small>POINTS</small>
+            </div>
+          </div>
+        )}
+
+        {member?.purchases?.length > 0 && (
+          <div style={{ marginTop: 30 }}>
+            <h2>Purchase History</h2>
+
+            {member.purchases.map((purchase) => (
+              <div
+                key={purchase.id}
+                style={{
+                  padding: "14px 0",
+                  borderBottom: "1px solid #ddd",
+                }}
+              >
                 <strong>
-                  {Number(member.totalPurchase || 0).toLocaleString()} Ks
+                  {Number(purchase.amount).toLocaleString()} Ks
                 </strong>
+
+                <div className="muted">
+                  +{purchase.points_earned} Points
+                </div>
+
+                <small>
+                  {new Date(
+                    purchase.created_at
+                  ).toLocaleString()}
+                </small>
               </div>
-
-              <div className="summary-card">
-                <span>Current Points</span>
-                <strong>{member.points} Points</strong>
-              </div>
-            </div>
-
-            <div className="history">
-              <h2>Purchase History</h2>
-
-              {member.purchases?.length ? (
-                member.purchases.map((purchase) => (
-                  <div className="purchase" key={purchase.id}>
-                    <div>
-                      <strong>
-                        {Number(purchase.amount).toLocaleString()} Ks
-                      </strong>
-
-                      <small>
-                        {purchase.created_at
-                          ? new Date(
-                              purchase.created_at
-                            ).toLocaleString()
-                          : ""}
-                      </small>
-                    </div>
-
-                    <span>
-                      +{purchase.points_earned} Points
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="muted">
-                  Purchase history မရှိသေးပါ။
-                </p>
-              )}
-            </div>
-          </>
+            ))}
+          </div>
         )}
       </section>
     </main>
